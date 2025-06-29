@@ -1,0 +1,15 @@
+{
+  "tests/test_user_routes.py::TestUserProfile::test_get_profile_unauthorized": true,
+  "tests/test_user_routes.py::TestUserProfile::test_get_profile_invalid_token": true,
+  "tests/test_user_routes.py::TestTokenVerification::test_verify_token_valid": true,
+  "tests/test_user_routes.py::TestUserLogout::test_logout_unauthorized": true,
+  "tests/test_services.py::TestCacheService::test_warm_up_cache": true,
+  "tests/test_services.py::TestSystemConfigService::test_generate_secret_key": true,
+  "tests/test_services.py::TestEnvironmentService::test_environment_service_initialization": true,
+  "tests/test_services.py::TestEnvironmentService::test_environment_detection": true,
+  "tests/test_services.py::TestEnvironmentService::test_config_structure": true,
+  "tests/test_services.py::TestTelegramService::test_telegram_service_initialization": true,
+  "tests/test_services.py::TestTelegramService::test_send_message_success": true,
+  "tests/test_services.py::TestTelegramService::test_send_message_failure": true,
+  "tests/test_security.py::TestSecurityIntegration::test_malicious_input_protection": true
+}

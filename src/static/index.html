@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Manager - Sistema de Gerenciamento</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        .auth-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-section h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #34495e;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60, #229954);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+        }
+
+        .dashboard {
+            display: none;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+        }
+
+        .user-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.3s;
+            color: white;
+        }
+
+        .tab.active {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .table th,
+        .table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Phishing Manager</h1>
+            <p>Sistema de Gerenciamento de Scripts de Phishing para Fins Educacionais</p>
+        </div>
+
+        <!-- Seção de Autenticação -->
+        <div id="auth-section" class="auth-section">
+            <h2>🔐 Login no Sistema</h2>
+            
+            <div id="login-form">
+                <div class="form-group">
+                    <label for="username">Usuário:</label>
+                    <input type="text" id="username" placeholder="Digite seu usuário">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Senha:</label>
+                    <input type="password" id="password" placeholder="Digite sua senha">
+                </div>
+                
+                <div id="otp-section" class="form-group hidden">
+                    <label for="otp-code">Código OTP (Telegram):</label>
+                    <input type="text" id="otp-code" placeholder="Digite o código de 6 dígitos">
+                </div>
+                
+                <button class="btn" onclick="login()">Entrar</button>
+                
+                <div class="alert alert-info">
+                    <strong>Credenciais de Teste:</strong><br>
+                    <strong>Admin:</strong> admin / admin123<br>
+                    <strong>Usuário:</strong> usuario / 123456
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações do Usuário Logado -->
+        <div id="user-info" class="user-info hidden">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong id="user-name"></strong> (<span id="user-role"></span>)<br>
+                    <small>Créditos: <span id="user-credits"></span> | OTP: <span id="user-otp"></span></small>
+                </div>
+                <button class="btn btn-danger" onclick="logout()">Sair</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Principal -->
+        <div id="dashboard" class="dashboard">
+            <!-- Estatísticas -->
+            <div class="card">
+                <h3>📊 Estatísticas do Sistema</h3>
+                <div id="stats-loading" class="loading">Carregando estatísticas...</div>
+                <div id="stats-content" class="hidden">
+                    <div class="stat-grid">
+                        <div class="stat-item">
+                            <div class="stat-number" id="total-users">0</div>
+                            <div class="stat-label">Usuários</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="total-domains">0</div>
+                            <div class="stat-label">Domínios</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="total-scripts">0</div>
+                            <div class="stat-label">Scripts</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number" id="total-urls">0</div>
+                            <div class="stat-label">URLs Geradas</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configurações OTP -->
+            <div class="card">
+                <h3>🔐 Configurações de Segurança</h3>
+                <div class="form-group">
+                    <label for="telegram-chat-id">Chat ID do Telegram:</label>
+                    <input type="text" id="telegram-chat-id" placeholder="Ex: 123456789">
+                </div>
+                <div class="form-group">
+                    <label for="telegram-username">Username do Telegram (opcional):</label>
+                    <input type="text" id="telegram-username" placeholder="Ex: @meuusername">
+                </div>
+                <button class="btn" onclick="configureTelegram()">Configurar Telegram</button>
+                <button class="btn btn-success" onclick="enableOTP()">Habilitar OTP</button>
+                <button class="btn btn-danger" onclick="disableOTP()">Desabilitar OTP</button>
+                <button class="btn" onclick="testOTP()">Testar OTP</button>
+            </div>
+        </div>
+
+        <!-- Painel Administrativo -->
+        <div id="admin-panel" class="card hidden">
+            <h3>⚙️ Painel Administrativo</h3>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="showTab('users')">Usuários</div>
+                <div class="tab" onclick="showTab('domains')">Domínios</div>
+                <div class="tab" onclick="showTab('scripts')">Scripts</div>
+                <div class="tab" onclick="showTab('logs')">Logs</div>
+            </div>
+
+            <!-- Tab Usuários -->
+            <div id="tab-users" class="tab-content active">
+                <h4>Gerenciamento de Usuários</h4>
+                <button class="btn" onclick="loadUsers()">Atualizar Lista</button>
+                <div id="users-list" class="loading">Carregando usuários...</div>
+            </div>
+
+            <!-- Tab Domínios -->
+            <div id="tab-domains" class="tab-content">
+                <h4>Gerenciamento de Domínios</h4>
+                <div class="form-row">
+                    <input type="text" id="new-domain" placeholder="Nome do domínio (ex: exemplo.com)">
+                    <button class="btn" onclick="createDomain()">Adicionar Domínio</button>
+                </div>
+                <button class="btn" onclick="loadDomains()">Atualizar Lista</button>
+                <div id="domains-list" class="loading">Carregando domínios...</div>
+            </div>
+
+            <!-- Tab Scripts -->
+            <div id="tab-scripts" class="tab-content">
+                <h4>Gerenciamento de Scripts</h4>
+                <div class="form-group">
+                    <input type="text" id="new-script-name" placeholder="Nome do script">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="new-script-path" placeholder="Caminho do arquivo">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="new-script-desc" placeholder="Descrição">
+                </div>
+                <button class="btn" onclick="createScript()">Adicionar Script</button>
+                <button class="btn" onclick="loadScripts()">Atualizar Lista</button>
+                <div id="scripts-list" class="loading">Carregando scripts...</div>
+            </div>
+
+            <!-- Tab Logs -->
+            <div id="tab-logs" class="tab-content">
+                <h4>Logs do Sistema</h4>
+                <button class="btn" onclick="loadLogs()">Atualizar Logs</button>
+                <div id="logs-list" class="loading">Carregando logs...</div>
+            </div>
+        </div>
+
+        <!-- Alertas -->
+        <div id="alerts"></div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        let authToken = null;
+
+        // Função para mostrar alertas
+        function showAlert(message, type = 'info') {
+            const alertsContainer = document.getElementById('alerts');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alertsContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        // Função de login
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const otpCode = document.getElementById('otp-code').value;
+
+            if (!username || !password) {
+                showAlert('Por favor, preencha usuário e senha.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password,
+                        otp_code: otpCode || undefined
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    if (data.otp_required) {
+                        document.getElementById('otp-section').classList.remove('hidden');
+                        showAlert(data.message, 'info');
+                        return;
+                    }
+
+                    authToken = data.token;
+                    currentUser = data.user;
+                    
+                    document.getElementById('auth-section').classList.add('hidden');
+                    document.getElementById('user-info').classList.remove('hidden');
+                    document.getElementById('dashboard').style.display = 'grid';
+                    
+                    if (currentUser.is_admin) {
+                        document.getElementById('admin-panel').classList.remove('hidden');
+                    }
+
+                    updateUserInfo();
+                    loadDashboardStats();
+                    showAlert('Login realizado com sucesso!', 'success');
+                } else {
+                    showAlert(data.error || 'Erro no login', 'error');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão: ' + error.message, 'error');
+            }
+        }
+
+        // Função de logout
+        function logout() {
+            authToken = null;
+            currentUser = null;
+            
+            document.getElementById('auth-section').classList.remove('hidden');
+            document.getElementById('user-info').classList.add('hidden');
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('admin-panel').classList.add('hidden');
+            document.getElementById('otp-section').classList.add('hidden');
+            
+            // Limpar campos
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('otp-code').value = '';
+            
+            showAlert('Logout realizado com sucesso!', 'success');
+        }
+
+        // Atualizar informações do usuário
+        function updateUserInfo() {
+            document.getElementById('user-name').textContent = currentUser.username;
+            document.getElementById('user-role').textContent = currentUser.is_admin ? 'Administrador' : 'Usuário';
+            document.getElementById('user-credits').textContent = currentUser.credits;
+            document.getElementById('user-otp').textContent = currentUser.otp_enabled ? 'Habilitado' : 'Desabilitado';
+        }
+
+        // Carregar estatísticas do dashboard
+        async function loadDashboardStats() {
+            if (!currentUser.is_admin) return;
+
+            try {
+                const response = await fetch('/api/admin/dashboard/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    document.getElementById('total-users').textContent = data.stats.total_users;
+                    document.getElementById('total-domains').textContent = data.stats.total_domains;
+                    document.getElementById('total-scripts').textContent = data.stats.total_scripts;
+                    document.getElementById('total-urls').textContent = data.stats.total_urls;
+                    
+                    document.getElementById('stats-loading').classList.add('hidden');
+                    document.getElementById('stats-content').classList.remove('hidden');
+                }
+            } catch (error) {
+                showAlert('Erro ao carregar estatísticas: ' + error.message, 'error');
+            }
+        }
+
+        // Configurar Telegram
+        async function configureTelegram() {
+            const chatId = document.getElementById('telegram-chat-id').value;
+            const username = document.getElementById('telegram-username').value;
+
+            if (!chatId) {
+                showAlert('Por favor, insira o Chat ID do Telegram.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/telegram/configure', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        telegram_username: username
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert(data.message, 'success');
+                    currentUser = data.user;
+                    updateUserInfo();
+                } else {
+                    showAlert(data.error || 'Erro ao configurar Telegram', 'error');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão: ' + error.message, 'error');
+            }
+        }
+
+        // Habilitar OTP
+        async function enableOTP() {
+            try {
+                const response = await fetch('/api/otp/enable', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert(data.message, 'success');
+                    currentUser = data.user;
+                    updateUserInfo();
+                } else {
+                    showAlert(data.error || 'Erro ao habilitar OTP', 'error');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão: ' + error.message, 'error');
+            }
+        }
+
+        // Desabilitar OTP
+        async function disableOTP() {
+            try {
+                const response = await fetch('/api/otp/disable', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert(data.message, 'success');
+                    currentUser = data.user;
+                    updateUserInfo();
+                } else {
+                    showAlert(data.error || 'Erro ao desabilitar OTP', 'error');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão: ' + error.message, 'error');
+            }
+        }
+
+        // Testar OTP
+        async function testOTP() {
+            try {
+                const response = await fetch('/api/otp/test', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert(data.message, 'success');
+                } else {
+                    showAlert(data.error || 'Erro ao testar OTP', 'error');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão: ' + error.message, 'error');
+            }
+        }
+
+        // Mostrar tab
+        function showTab(tabName) {
+            // Remover classe active de todas as tabs
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Adicionar classe active na tab selecionada
+            event.target.classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        // Carregar usuários
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/admin/users', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const usersList = document.getElementById('users-list');
+                    
+                    let html = '<table class="table"><thead><tr><th>ID</th><th>Usuário</th><th>Email</th><th>Tipo</th><th>Créditos</th><th>Status</th><th>OTP</th></tr></thead><tbody>';
+                    
+                    data.users.forEach(user => {
+                        html += `<tr>
+                            <td>${user.id}</td>
+                            <td>${user.username}</td>
+                            <td>${user.email}</td>
+                            <td><span class="badge ${user.is_admin ? 'badge-warning' : 'badge-success'}">${user.is_admin ? 'Admin' : 'Usuário'}</span></td>
+                            <td>${user.credits}</td>
+                            <td><span class="badge ${user.is_banned ? 'badge-danger' : 'badge-success'}">${user.is_banned ? 'Banido' : 'Ativo'}</span></td>
+                            <td><span class="badge ${user.otp_enabled ? 'badge-success' : 'badge-danger'}">${user.otp_enabled ? 'Sim' : 'Não'}</span></td>
+                        </tr>`;
+                    });
+                    
+                    html += '</tbody></table>';
+                    usersList.innerHTML = html;
+                }
+            } catch (error) {
+                showAlert('Erro ao carregar usuários: ' + error.message, 'error');
+            }
+        }
+
+        // Carregar domínios
+        async function loadDomains() {
+            try {
+                const response = await fetch('/api/admin/domains', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const domainsList = document.getElementById('domains-list');
+                    
+                    let html = '<table class="table"><thead><tr><th>ID</th><th>Domínio</th><th>Status</th><th>Criado em</th></tr></thead><tbody>';
+                    
+                    data.domains.forEach(domain => {
+                        html += `<tr>
+                            <td>${domain.id}</td>
+                            <td>${domain.domain_name}</td>
+                            <td><span class="badge ${domain.is_active ? 'badge-success' : 'badge-danger'}">${domain.is_active ? 'Ativo' : 'Inativo'}</span></td>
+                            <td>${new Date(domain.created_at).toLocaleDateString('pt-BR')}</td>
+                        </tr>`;
+                    });
+                    
+                    html += '</tbody></table>';
+                    domainsList.innerHTML = html;
+                }
+            } catch (error) {
+                showAlert('Erro ao carregar domínios: ' + error.message, 'error');
+            }
+        }
+
+        // Criar domínio
+        async function createDomain() {
+            const domainName = document.getElementById('new-domain').value;
+
+            if (!domainName) {
+                showAlert('Por favor, insira o nome do domínio.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/domains/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        domain_name: domainName
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert(data.message, 'success');
+                    document.getElementById('new-domain').value = '';
+                    loadDomains();
+                } else {
+                    showAlert(data.error || 'Erro ao criar domínio', 'error');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão: ' + error.message, 'error');
+            }
+        }
+
+        // Carregar scripts
+        async function loadScripts() {
+            try {
+                const response = await fetch('/api/admin/scripts', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const scriptsList = document.getElementById('scripts-list');
+                    
+                    let html = '<table class="table"><thead><tr><th>ID</th><th>Nome</th><th>Descrição</th><th>Status</th><th>Criado em</th></tr></thead><tbody>';
+                    
+                    data.scripts.forEach(script => {
+                        html += `<tr>
+                            <td>${script.id}</td>
+                            <td>${script.name}</td>
+                            <td>${script.description || 'N/A'}</td>
+                            <td><span class="badge ${script.is_active ? 'badge-success' : 'badge-danger'}">${script.is_active ? 'Ativo' : 'Inativo'}</span></td>
+                            <td>${new Date(script.created_at).toLocaleDateString('pt-BR')}</td>
+                        </tr>`;
+                    });
+                    
+                    html += '</tbody></table>';
+                    scriptsList.innerHTML = html;
+                }
+            } catch (error) {
+                showAlert('Erro ao carregar scripts: ' + error.message, 'error');
+            }
+        }
+
+        // Criar script
+        async function createScript() {
+            const name = document.getElementById('new-script-name').value;
+            const path = document.getElementById('new-script-path').value;
+            const description = document.getElementById('new-script-desc').value;
+
+            if (!name || !path) {
+                showAlert('Por favor, preencha nome e caminho do script.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/admin/scripts/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        name: name,
+                        file_path: path,
+                        description: description
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert(data.message, 'success');
+                    document.getElementById('new-script-name').value = '';
+                    document.getElementById('new-script-path').value = '';
+                    document.getElementById('new-script-desc').value = '';
+                    loadScripts();
+                } else {
+                    showAlert(data.error || 'Erro ao criar script', 'error');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão: ' + error.message, 'error');
+            }
+        }
+
+        // Carregar logs
+        async function loadLogs() {
+            try {
+                const response = await fetch('/api/admin/logs?per_page=20', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const logsList = document.getElementById('logs-list');
+                    
+                    let html = '<table class="table"><thead><tr><th>Data/Hora</th><th>Ação</th><th>Detalhes</th></tr></thead><tbody>';
+                    
+                    data.logs.forEach(log => {
+                        html += `<tr>
+                            <td>${new Date(log.timestamp).toLocaleString('pt-BR')}</td>
+                            <td><strong>${log.action}</strong></td>
+                            <td>${log.details || 'N/A'}</td>
+                        </tr>`;
+                    });
+                    
+                    html += '</tbody></table>';
+                    logsList.innerHTML = html;
+                }
+            } catch (error) {
+                showAlert('Erro ao carregar logs: ' + error.message, 'error');
+            }
+        }
+
+        // Event listeners
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+
+        document.getElementById('otp-code').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+    </script>
+</body>
+</html>
+
